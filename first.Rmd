@@ -1,0 +1,45 @@
+---
+title: "first markdown file"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Reading the Data
+
+This is data that shows the favorite restaurants of students. Details relevant to each restaurant are included.
+
+```{r}
+class <- read_csv("C://users//ra4ct/Desktop//fav_restaurants.csv")
+```
+
+## Plotting the Data
+
+```{r}
+ggplot(class, aes(cuisine)) +
+  geom_bar()
+```
+
+This is a graphic showing the popularity of type of cuisine across all of the restaurants. 
+
+```{r}
+ggplot(class, aes(yearly_visits, cost_per_person)) +
+  geom_point()
+```
+
+This is a scatter plot showing the correlation between the avergage cost per person at the restaurant and the amount of times that the restaurant is visited by that person per year. 
+
+```{r}
+ggplot(class, aes(location)) +
+  geom_bar()
+```
+
+This is a bar graph showing the location of each restaurant. There are many restaurants that are only in one location, but many people's favorite restaurants are in the same location.
