@@ -1,0 +1,52 @@
+---
+title: "Lab 09: Annotating Data Visualizations"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+theme_set(theme_minimal())
+```
+
+
+```{r, include=FALSE}
+murder <- read_csv("https://statsmaths.github.io/stat_data/murder_by_city.csv")
+```
+
+
+```{r}
+ggplot(murder, aes(state, murders_2014)) +
+  geom_point(color="gray") +
+  geom_point(aes(state, murders_2015), color="blue") +
+  ylab("Murder Rate") +
+  xlab("State") +
+  ggtitle("Murder Rates by State in 2014 versus 2015") +
+  annotate("rect", xmin=0, xmax=35,
+           ymin=290, ymax=500,
+           fill="purple", alpha=0.1) +
+  annotate("text", x=25, y=470,
+           label="Highest Murder Rates", size=5) +
+  annotate("text", x=10, y=500, label="Chicago, IL") +
+  annotate("text", x=24, y=375, label="New York, NY") +
+  annotate("text", x=31, y=325, label="Houston, TX") +
+  annotate("text", x=17, y=320, label="Detroit, MI") +
+  annotate("text", x=15, y=370, label="Baltimore, MD")
+```
+
+This graph displays the murder rates in 2014 (gray), and 2015 (blue). The cities with the highest murder rates are in Chicago, New York City, Baltimore, Houston, and Detroit. The city with the largest change in number of murders between 2014 and 2015 is Chicago, with a difference of 133 more murders in 2015 than in 2014.
+
+
+
+
+
