@@ -1,0 +1,77 @@
+---
+title: "Lab 10: Filtering Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+theme_set(theme_minimal())
+```
+
+
+```{r}
+tarantino <- read_csv("https://statsmaths.github.io/stat_data/tarantino.csv")
+```
+
+
+```{r}
+ggplot(tarantino, aes(movie, word)) +
+  geom_point(aes(color=word)) +
+  xlab("Movie") +
+  ylab("Word") +
+  ggtitle("All Swear Words in Seven Tarantino Films")
+```
+
+First, this is the plot of all of the swear words used in seven of Quentin Tarantino's films, indicating if a particular swear word was used at any time over the course of the movie.
+
+```{r}
+fucks <- filter(tarantino, word %in% c("fuck", "fucked", "fucker", "fuckers", "fuckface", "fuckhead", "fucking", "fucks", "fuckup"))
+```
+
+```{r}
+ggplot(fucks, aes(movie, word)) +
+  geom_point(aes(color=word)) +
+  xlab("Movie") +
+  ylab("Word") +
+  ggtitle("Presence of Word in Movie")
+```
+Again, this graph displays whether or not the specific swear word was used in the movie, but does not quantify how many times the word was used. From this graph, we can see that the word "fuck," or at least a version of it, was used in all of these seven Tarantino films.
+
+```{r}
+ggplot(fucks, aes(movie, minutes_in)) +
+  geom_point(aes(color=word)) +
+  xlab("Movie") +
+  ylab("Minutes into Movie") +
+  ggtitle("Frequency of Word Use")
+```
+In this graph, the points display at what time in the movie the swears occur. The colors in the graph distinguish which version of the word "fuck" is being used. We can see that movies such as "Kill Bill Vol. 1" and "Kill Bill Vol. 2" have much lower frequencies of swear words than other movies such as "Jackie Brown" and "Pulp Fiction."
+
+In addition, there are lots of blue and red points, indicating that the words "fuck" and "fucking" are used frequently. This may be due to the fact that "fuck" and "fucking" are easily inserted into other words in the English language (e.g. "in-fucking-credible," "un-fucking-believable"), so this is one reason why they may be used more frequently than other versions of "fuck" that are used for name-calling (e.g. "fuckup," "fuckhead").
+
+```{r}
+first_5min <- filter(tarantino, minutes_in <= 5)
+```
+
+```{r}
+ggplot(first_5min, aes(movie, minutes_in)) +
+  geom_point(aes(color=word)) +
+  xlab("Movie") +
+  ylab("Time into Fist 5 Minutes of Movie") +
+  ggtitle("Swear Words Used within First 5 Minutes of Movie")
+```
+
+This graph displays any swear words used within the first five minutes of the movie. There are only four of the seven films displayed on this graph, so the other three movies ("Djamngo Unchained," "Inglourious Basterds," "Kill Bill Vol. 1,") do not use any swear words within the first five minutes of the movie. Similar to the previous graphs, the word "fuck" and variations of it (coded in blue-green colors) are used frequently within the first five minutes in the two movies that use swear words most ("Pulp Fiction" and "Resevoir Dogs").
+
+From all of these graphs together, we can conclude that many profanities are used in the films of Quentin Tarantino overall.
+
