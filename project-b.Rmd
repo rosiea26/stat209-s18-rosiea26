@@ -1,0 +1,94 @@
+---
+title: 'Project B: Visualizing Communities (Fairfield County)'
+author: "Rosie Armstrong"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+```
+
+```{r, echo=FALSE}
+tracts <- read_csv("https://raw.githubusercontent.com/statsmaths/stat_data/gh-pages/acs_tract_data_2016.csv.gz")
+```
+
+```{r, echo=FALSE}
+stamford <-filter(tracts, cbsa=="Bridgeport-Stamford-Norwalk, CT")
+```
+##Fairfield County, CT
+
+Fairfield County contains an array of towns and cities, from the exceedingly wealthy Greenwich and Westport, to the business hub of Stamford and low-income Bridgeport. The County is known for its high population of commuters to New York City with high-income professions. However, this creates a large gap in socioeconomic status from town to town, with pockets of extreme wealth surrounded by an abundance of economic hardship. This report will explore the disparities in wealth in Fairfield County and provide some explanations as to why this occurs.
+
+##Ages Within Fairfield County, 5th Quartile
+
+This graph displays age groups within each census tract in the 5th quartile of household income. A census tract is a small geographic area the size of a neighborhood, in this case within Fairfield County, CT. The two age groups displayed in this graph are professional and post-college age people aged 25-59, and people who qualify to be retired or at the end of their careers aged over 60.
+
+```{r, echo=FALSE}
+ggplot(stamford, aes(age_25_59, hh_income_q5)) +
+  geom_point(color="light blue") +
+  geom_point(aes(age_60_plus, hh_income_q5), color="pink") +
+  ggtitle("Age within the 5th Quartile") +
+  xlab("Percentage of Residents by Age") +
+  ylab("Mean Income for Households in 5th Quartile") +
+  annotate("text", x=10, y=750000, label="Age 60+") +
+  annotate("text", x=55, y=750000, label="Age 25-59")
+```
+
+The census tracts in the top 5th quartile have a majority of working-age people (blue), and a minority of people who are around or above retirement-age (pink). One explanation for this is that many people in Fairfield County are professionals (such as lawyers or firm executives) who commute to New York City but live in the suburbs. These people tend to, once they reach retirement age or their children move away from home, move to another area outside of Fairfield County to retire; for this reason, the people who are still working and earning money within the 5th quartile are still living in Fairfield County and commuting to NYC or Stamford, and those who are retired or retiring are more likely to be leaving the County and making up a minority of the tract's population.
+
+##Top Fifth Percentile
+
+This graph displays the proportion of populations by race in Fairfield County, CT that are in the top fifth percentile of household income. Each point on the graph per color represents the percentage of residents that exist, by race, within that specific census tract. Proportions of the white population are indicated in blue, and proportions of minority populations are indicated in green. Since white people make up the majority of the population within the majority of census tracts, minority populations are aggregated into one category. The populations categorized as "minority" include Black, Asian, Native American, Pacific Islander, multi-racial people, and those categorized in the data as "others."
+
+```{r, echo=FALSE}
+stamford$race_minority <- stamford$race_black + stamford$race_ntvam + stamford$race_pacif + stamford$race_multi + stamford$race_other
+```
+
+```{r, echo=FALSE}
+ggplot(stamford, aes(race_white, hh_income_top_5)) +
+  geom_point(color="blue", alpha=0.5) +
+  geom_point(aes(race_minority, hh_income_top_5), color="dark green", alpha=0.5) +
+  ggtitle("Top Fifth Percentile Household Income by Race in Fairfield County") +
+  xlab("Percentage of Residents in Each Tract by Race") +
+  ylab("Top Fifth Percentile of Household Income") +
+  annotate("text", x=20, y=1500000, label="People of Minority Races", size=3) +
+  annotate("text", x=75, y=1500000, label="White People", size=3)
+```
+
+Each census tract has two points; one point for white residents (blue) and one point for minority residents (green). For example, the top-most points around the household income of $2,500,000 include one point for minority residents on the far left (because minority residents make up a small percentage of the population in this tract) and one point for white residents on the far right (because white residents make up nearly 100% of the population in this tract).
+
+This graph makes apparent the extensive wealth disparities between races in Fairfield County; though there are portions of people of each race that are wealthy, white people make up the majority within extremely wealthy census tracts and the black, asian, and other racial populations make up the minority of the population within extremely wealthy census tracts. Even in the wealthiest areas of Fairfield County, census tracts that consist of over 50% of minority populations make up the lowest portions of the top fifth percentile.
+
+##People Born In-State, by Race
+
+This graph displays proportions of the population that were born in Connecticut and live in Connecticut, according to race. The red points represent people who are white, and the purple points represent people who are black, native american, asian, pacific islander, of mixed race, or of another race. Non-white people are again referred to here collectively as minorities because white people hold the majority of the population in Fairfield County.
+
+```{r, echo=FALSE}
+ggplot(stamford, aes(race_white, born_same_st)) +
+  geom_point(color="red", alpha=0.5) +
+  geom_point(aes(race_minority, born_same_st), color="purple", alpha=0.5) +
+  ggtitle("Race Distribution in Young People") +
+  xlab("Percentage of Population by Race") +
+  ylab("Percentage of Residents Born in Connecticut") +
+  annotate("text", x=60, y=30, label="<--Tracts with majority white people -->") +
+  annotate("rect", xmin=50, xmax=85, ymin=60, ymax=90, color="pink", alpha=0.1) +
+  annotate("text", x=70, y=90, label="Tracts with majority non-white people")
+```
+
+The census tracts, as on the first two graphs, are plotted as two points per tract: one point for the percentage of white people (displayed in red), and one point for people of minority races in Fairfield County (displayed in purple). Tracts with high percentages of white people and low percentages of minority people can be seen on the far ends of the graph, while tracts with a balance of races and tracts with high percentages of minority people can be seen towards the middle of the graph.
+
+The tracts with majority white people have many points that fall within 20-70% of residents born in CT. The tracts with majority of people of other races fall along this same range. However, almost all of the census tracts that consist of a majority of people of minority races (see highlighted portion of graph) have above 60% of the residents born in-state. This means that neighborhoods that are populated mostly with minority people are more likely to be born in Connecticut and stay there while mostly-white neighborhoods consist of people who were born someplace else and moved to Fairfield County. People in minority neighborhoods are thus less likely to move out-of-state (such as for education and employment) while people in white neighborhoods are more likely to have gained an education out-of-state or moved to Connecticut perhaps for higher education, or for the purpose of living in the Connecticut suburbs and working in New York City. In addition, this data may imply that neighborhoods consisting of mostly minority residents do not have the economic means or same opportunities as mostly-white neighborhoods to move out-of-state.
+
+##Summary
+
+The three graphs above make apparent the wealth disparities in Fairfield County, Connecticut. People who have a mean household income in the top 5th quartile are mostly aged 25-59, a prime age for college graduates, those with professional education, and those with high-income professions. The census tracts in the top fifth percentile of household income consist of majority white populations, while the census tracts with bare-majority of minority races make up the lowest parts of the top 5th percentile. Finally, census tracts with majority white people do not have many people born in-state, while the census tracts that are mostly made up of minority populations consist of high rates of people who were born in-state. From this data, we can conclude that there is a large wealth disparity in Fairfield County, possibly accounted for by having a high concentration of young and middle-aged people, people with high-earning professions moving to the County to work in Stamford or New York City, and minority races staying in-state potentially not moving out-of-state for higher education or professional experience (implying also a disparity in socioeconomic mobility opportunities).
