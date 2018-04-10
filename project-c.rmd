@@ -1,0 +1,99 @@
+---
+title: "Project C"
+author: "Rosie Armstrong"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+library(smodels)
+```
+
+```{r}
+phone_use <- read_csv("https://raw.githubusercontent.com/URstats/stat209-s18-rosiea26/master/projectc_data.csv")
+phone_use
+```
+
+##Data Dictionary
+- **group**: The number of people walking in the group of the person observed.
+- **behavior**: The behavior of the person walking, with possible behaviors including: being on one's cell phone, talking to another person, or participating in neither of these behaviors (neutral).
+- **tod**: The time of day that the person was observed participating in the behavior, including times of 8:00a.m.(8.0 hours), 12:00p.m. (12.0 hours), and 4:00p.m. (16.0 hours).
+
+## Introduction
+This data considers the behaviors of students as they walk to and from classes on campus, including information about the number of people in the group that includes the individual student, as well as the time of day that the student was observed. The behaviors include talking to one another, using one's cell phone, or simply walking without talking or using a cell phone. 
+
+I predict that people will be more likely to be using cell phones and to be in smaller groups (alone or with one other person) in the early hours of the day (more towards 8.0 hours) when most people are tired and less inclined to be social. I also predict that people will engage in talking behavior more and be in larger groups during the later hours of the day (after 12.0 hours); this is when people eat lunch, finish classes, and tend to be more social. I predict that neutral behavior will be exhibited towards the early hours of the day (8.0 hours) when people are not talking to others as much as in later hours of the day.
+
+## Methods
+This data was collected by observing students in the school commons during three times of day between classes. The models fit differences between estimated means for the variables. The baseline for the behavior variable is "neutral", as talking and using one's cell phone are both variations compared to the neutral behavior of simply walking.
+
+## Results
+
+**Time of day and behavior:**
+```{r}
+model <- lm_basic(tod ~ 1 + behavior, data = phone_use)
+reg_table(model, level = 0.95)
+```
+
+```{r}
+ggplot(phone_use, aes(behavior, tod)) +
+  geom_boxplot()
+```
+
+The model above describes the mean time of day for each behavior. Neutral behavior tends to occur throughout the day, averaging in the middle of the day around 12 noon (specifically at 11.8095 hours, around 11:50a.m.). Phone behavior has a mean more towards the earlier times of day before the mean for neutral behavior (specifically at 10.4165 hours, around 10:25a.m.). Talking behavior has a mean more towards the later times of day after the mean for neutral behavior and far from the early times of day (specifically at 13.0793 hours, around 1:05p.m.). The graphic below depicts the same output, but perhaps with a better visualization of the distribution of behaviors. 
+
+```{r}
+ggplot(phone_use, aes(behavior, tod)) +
+  geom_violin()
+```
+
+**Group size and behavior:**
+
+```{r}
+model <- lm_basic(group ~ 1 + behavior, data = phone_use)
+reg_table(model, level = 0.95)
+```
+
+```{r}
+ggplot(phone_use, aes(behavior, group)) +
+  geom_boxplot()
+```
+
+The model above describes the mean number of people in each group by behavior. People engaging in neutral behavior are likely to be in groups with a mean of 1.28 people, with most people engaging in neutral behavior being alone (a group of one). People engaging in phone behavior are likely to be in groups with a mean of 1.9 people, with most people engaging in phone behavior tending to be in smaller groups but not always alone. People engaging in talking behavior are likely to be in groups of 2.95 people, with most people being in groups of two or more people and never alone.
+
+**Group size and time of day:**
+```{r}
+model <- lm_basic(group ~ 1 + tod, data = phone_use)
+reg_table(model, level = 0.95)
+```
+
+```{r}
+ggplot(phone_use, aes(tod, group)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+The model above describes how the group size changes with the time of day. The mean number of people in a group at 8a.m.  (8.0 hours) is 1.83933 people (since the intercept describes the amount of people likely to be in a group at 0 hours, midnight). The mean number of people in a group at 12p.m. noon (12.0 hours) is 2.32933 people. The mean number of people in a group at 4p.m. (16.0 hours) is 2.81933 people. As the hours in the day increase, the mean number of people in each group also increases. 
+
+## Conclusions
+
+For time of day and behavior, there was no significant effect. However, the patterns followed the hypothesis of phone behavior occuring more in the earlier hours of the day and talking behavior occuring more in the later hours of the day. The prediction of neutral behavior occuring in early hours of the day was not correct.
+
+For group size and behavior, there was a significant effect, but in a different manner than expected. Interestingly, the mean amount of people who engaged in phone-using behavior lied within groups of more than one person, indicating that people walking to class with others would sometimes use their phone as opposed to talking to the other person. This is slightly different from the initial hypothesis of people mostly being alone when they use their phones. As predicted, talking behavior increased as group size increased, as there are more people to talk to.
+
+For group size and time of day, there was a significant positive effect in the direction expected. The amount of people in each group was influenced heavily by the time of day, with more people walking alone or in small groups in earlier hours of the day and more people walking in larger groups and not alone in the later hours of the day. 
+
+Time of day has an effect on the number of people within a group, and the number of people within a group has an effect on the behavior of the people within that group. More people use phones in the company of others than had been expected. The time of day has some effect on the displayed behavior of a person, but not to any significant degree. Perhaps the confidence intervals in the first model considering time of day and behavior are wide and not significant because people have individual differences and preferences for what they do on the way to class, not considering the factor of other people influencing their behavior.
+
+## References
