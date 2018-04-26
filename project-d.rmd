@@ -1,0 +1,73 @@
+---
+title: "Project D"
+author: "Rosie Armstrong"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(ggmap)
+library(viridis)
+library(forcats)
+library(smodels)
+```
+
+```{r}
+cancer <- read_csv("https://statsmaths.github.io/stat_data/cancer_inc_data.csv")
+```
+
+**Thesis:** Melanoma rates are typically high in states with high sun exposure, such as southern states and states popular for skiing. However, this is not always true such as in Utah, which may be a result of melanoma rates being high in areas with high proportions of people identifying as "White."
+
+```{r}
+cancer_state <-group_summarize(cancer, state)
+```
+
+1. Melanoma by state
+```{r}
+ggplot(cancer_state, aes(state, melanoma_mean)) +
+  geom_point() +
+  annotate("point", x = "ut", y = 33.20625, color = "light blue") +
+  annotate("point", x="dc", y=8.3, color="light blue") +
+  annotate("text", x="ut", y=32, label="Utah") +
+  annotate("text", x="dc", y=10, label="Washington DC") +
+  ylab("Mean Melanoma Rate Per 1000 Men") +
+  xlab("State")
+```
+
+The two major outliers in this data are Utah and Washington, Dc. One would expect that the highest rates of melanoma would be found in states with high sun exposure, in warm states such as Florida or in states with lots of skiing such as Vermont. Those states have relatively high rates, but not as high as Washington DC and Utah. 
+
+2. Percentage of the State identifying as "Black"
+```{r}
+ggplot(cancer_state, aes(state, black_alone_mean)) +
+  geom_point() +
+  annotate("point", x = "ut", y = 0.6893476, color = "pink") +
+  annotate("point", x="dc", y=48.3450150, color="pink") +
+  annotate("text", x="ut", y=3, label="Utah") +
+  annotate("text", x="dc", y=46, label="Washington DC") +
+  ylab("Mean Percentage of Population Identifying as 'Black'") +
+  xlab("State")
+```
+
+This graph displays the percentage of the state that identifies as "Black." The percentage of Washington DC that identifies as "Black" is almost 50%, while the percentage of Utah that identifies as "Black" is nearly 0%. The majority of Utah's population identifies as "White," about 90%, and can be accounted for by a large homogeneous population of Mormons and people of European descent. Washington DC, as a city and hub of politics and business, is more diverse in its population and contains a larger population of people identifying as "Black."
+
+
+3. Melanoma as a Function of Race
+```{r}
+model <- lm_basic(melanoma_mean ~ 1 + black_alone_mean, data = cancer_state)
+reg_table(model, level = 0.95)
+```
+
+This model displays melanoma as a function of race, predicting that with higher melanoma rates, there is a smaller percentage of the population that identifies as "Black" and areas with large percentages of the population that idenitfy as "Black" have low rates of melanoma.
+
+**Conclusion**
+
+Utah has a mean incidence rate of melanoma per 100,000 men over 18 years of age of about 33.2 people. In addition, Utah is a highly-White and homogeneous state with less than 1% of the state population identifying as "Black." The high rate of melanoma in this case is most likely due to the high population of people identifying as "White," as low pigmentation in the skin makes the skin susceptible to ultraviolet radiation and thus at risk for melanoma. On the other hand, Washington DC has a high percentage of the population, nearly 50%, identifying as "Black," with only about 8.3 people with melanoma per 100,000 men over 18 years of age. The low rate of melanoma in this case can be affected by the large percentage of the population with high pigmentation in the skin which protects the skin from harmful ultraviolet radiation and lowers the risk for melanoma. As stated in the thesis, race influences rates of melanoma, and variation of race in the population is correlated with geography, so melanoma rates can be traced across geography depending on the people who make up the area's population.
+
